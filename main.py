@@ -29,3 +29,5 @@ print('Mean MAE: %.3f (%.3f)' % (scores.mean(), scores.std()))
 prediction = model.predict(x_test)
 
 print('Prediction: ', prediction)
+
+model.save_model("model_xgb.json")

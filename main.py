@@ -1,9 +1,3 @@
-'''
-TODO:
-output to file
-constants for params
-'''
-
 import pandas as pd
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 import xgboost as xgb

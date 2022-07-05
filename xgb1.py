@@ -49,7 +49,7 @@ all_time_prediction = time.time() - start_time_prediction
 
 print("Time of prediction: ", all_time_prediction)
 
-output_file = open('output.csv', 'w')
+output_file = open('output_xgb.csv', 'w')
 i = 0
 
 print('Id,Prediction', file=output_file)

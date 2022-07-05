@@ -21,18 +21,21 @@ data_test = pd.read_csv(INPUT_PATH_TEST)
 
 y_train = data_train.revenue
 y_train = y_train.astype(int)
-x_train = data_train.drop(columns=['revenue', 'Id'])
+x_train = data_train.drop(columns=['revenue', 'Id', 'City'])
 
-for column in columns_for_hash:
-    x_train[column] = x_train[column].apply(hash)
+x_train = x_train.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
+x_train = x_train.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
+tmp = x_train['Open Date'].str.split('/')
+x_train['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
-x_test = data_test.drop(columns=['revenue', 'Id'])
-for column in columns_for_hash:
-    x_test[column] = x_test[column].apply(hash)
+x_test = data_test.drop(columns=['revenue', 'Id', 'City'])
+x_test = x_test.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
+x_test = x_test.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
+tmp = x_test['Open Date'].str.split('/')
+x_test['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
 model = RandomForestRegressor(n_estimators=TREES_COUNT, random_state=RANDOM_STATE_MODEL)
 model.fit(x_train, y_train)
-
 
 cv = RepeatedKFold(n_splits=N_SPLITS, n_repeats=N_REPEATS, random_state=RANDOM_STATE_METRIC)
 

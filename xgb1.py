@@ -2,6 +2,8 @@ import pandas as pd
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 import xgboost as xgb
 import time
+import datetime
+import numpy as np
 
 INPUT_PATH_TRAIN = 'input/train.csv'
 INPUT_PATH_TEST = 'input/train.csv'
@@ -16,21 +18,25 @@ N_SPLITS = 10
 N_REPEATS = 3
 RANDOM_STATE = 1
 
-columns_for_hash = ['Open Date', 'City', 'City Group', 'Type']
+columns_for_hash = ['Open Date', 'City Group', 'Type']
 
 data_train = pd.read_csv(INPUT_PATH_TRAIN)
 data_test = pd.read_csv(INPUT_PATH_TEST)
 
 y_train = data_train.revenue
 y_train = y_train.astype(int)
-x_train = data_train.drop(columns=['revenue', 'Id'])
+x_train = data_train.drop(columns=['revenue', 'Id', 'City'])
 
-for column in columns_for_hash:
-    x_train[column] = x_train[column].apply(hash)
+x_train = x_train.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
+x_train = x_train.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
+tmp = x_train['Open Date'].str.split('/')
+x_train['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
-x_test = data_test.drop(columns=['revenue', 'Id'])
-for column in columns_for_hash:
-    x_test[column] = x_test[column].apply(hash)
+x_test = data_test.drop(columns=['revenue', 'Id', 'City'])
+x_test = x_test.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
+x_test = x_test.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
+tmp = x_test['Open Date'].str.split('/')
+x_test['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
 model = xgb.XGBRegressor(n_estimators=GRADIENT_BOOSTED_TREES_COUNT, max_depth=MAX_DEPTH_TREE, eta=STEP_SIZE_DECREASE,
                          subsample=SUBSAMPLE, colsample_bytree=SUBSAMPLE_RATIO_COLUMNS)

@@ -13,8 +13,7 @@ def dataset_split_train(INPUT_PATH_TRAIN='input/train.csv'):
 
     x_train = x_train.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
     x_train = x_train.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
-    x_train['Open Date'] = pd.to_datetime(x_train['Open Date'], format='%m/%d/%Y')
-    x_train['Open Date'] = pd.to_datetime(x_train['Open Date']).astype(np.int64)
+    x_train['Open Date'] = pd.to_datetime(x_train['Open Date'], format='%m/%d/%Y').astype(np.int64)
 
     return [x_train, y_train]
 
@@ -25,8 +24,7 @@ def dataset_split_test(INPUT_PATH_TEST='input/test.csv'):
     x_test = data_test.drop(columns=['Id', 'City'])
     x_test = x_test.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
     x_test = x_test.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
-    x_test['Open Date'] = pd.to_datetime(x_test['Open Date'], format='%m/%d/%Y')
-    x_test['Open Date'] = pd.to_datetime(x_test['Open Date']).astype(np.int64)
+    x_test['Open Date'] = pd.to_datetime(x_test['Open Date'], format='%m/%d/%Y').astype(np.int64)
     return x_test
 
 

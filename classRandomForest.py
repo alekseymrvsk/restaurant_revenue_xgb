@@ -39,7 +39,7 @@ class MyRandomForest:
         self.RANDOM_STATE_MODEL = RANDOM_STATE_MODEL
         self.TREES_COUNT = TREES_COUNT
 
-    def fit_model(self, input_path_train):
+    def fit_model(self, input_path_train='input/train.csv'):
         dataset = dataset_split_train(input_path_train)
         x_train = dataset[0]
         y_train = dataset[1]
@@ -48,7 +48,7 @@ class MyRandomForest:
         return model
 
     @staticmethod
-    def predict_data(model, input_path_test):
+    def predict_data(model, input_path_test='input/test.csv'):
         dataset = dataset_split_test(input_path_test)
         x_test = dataset
 

@@ -6,7 +6,7 @@ import datetime
 import numpy as np
 
 INPUT_PATH_TRAIN = 'input/train.csv'
-INPUT_PATH_TEST = 'input/train.csv'
+INPUT_PATH_TEST = 'input/test.csv'
 
 SUBSAMPLE_RATIO_COLUMNS = 0.8
 SUBSAMPLE = 0.7
@@ -32,7 +32,7 @@ x_train = x_train.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
 tmp = x_train['Open Date'].str.split('/')
 x_train['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
-x_test = data_test.drop(columns=['revenue', 'Id', 'City'])
+x_test = data_test.drop(columns=['Id', 'City'])
 x_test = x_test.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
 x_test = x_test.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
 tmp = x_test['Open Date'].str.split('/')

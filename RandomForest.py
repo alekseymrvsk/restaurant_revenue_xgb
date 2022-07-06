@@ -12,9 +12,9 @@ N_REPEATS = 3
 RANDOM_STATE_METRIC = 1
 
 INPUT_PATH_TRAIN = 'input/train.csv'
-INPUT_PATH_TEST = 'input/train.csv'
+INPUT_PATH_TEST = 'input/test.csv'
 
-columns_for_hash = ['Open Date', 'City', 'City Group', 'Type']
+# columns_for_hash = ['Open Date', 'City', 'City Group', 'Type']
 
 data_train = pd.read_csv(INPUT_PATH_TRAIN)
 data_test = pd.read_csv(INPUT_PATH_TEST)
@@ -28,7 +28,7 @@ x_train = x_train.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
 tmp = x_train['Open Date'].str.split('/')
 x_train['Open Date'] = tmp.str[1].astype(int) + tmp.str[0].astype(int) * 30 + tmp.str[2].astype(int) * 365
 
-x_test = data_test.drop(columns=['revenue', 'Id', 'City'])
+x_test = data_test.drop(columns=['Id', 'City'])
 x_test = x_test.replace({'City Group': {'Other': 0, 'Big Cities': 1}})
 x_test = x_test.replace({'Type': {'FC': 0, 'IL': 1, 'DT': 2, 'MB': 3}})
 tmp = x_test['Open Date'].str.split('/')
@@ -43,8 +43,6 @@ scores = cross_val_score(model, x_train, y_train, scoring='neg_mean_absolute_err
 scores = abs(scores)
 
 print('Mean MAE: %.3f (%.3f)' % (scores.mean(), scores.std()))
-
-prediction = model.predict(x_test)
 
 start_time_prediction = time.time()
 prediction = model.predict(x_test)

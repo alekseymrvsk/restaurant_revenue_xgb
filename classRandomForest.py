@@ -2,6 +2,8 @@ import pandas as pd
 import numpy as np
 from sklearn.ensemble import RandomForestRegressor
 import joblib
+from sklearn.model_selection import RepeatedKFold, cross_val_score
+from attrdict import AttrDict
 
 
 def dataset_split_train(INPUT_PATH_TRAIN='input/train.csv'):
@@ -29,7 +31,18 @@ def dataset_split_test(INPUT_PATH_TEST='input/test.csv'):
 
 
 class MyRandomForest:
+    # def __init__(self, RANDOM_STATE_MODEL=1, TREES_COUNT=50, N_SPLITS=10, N_REPEATS=3, RANDOM_STATE_METRIC=1):
+    #     self.scores = None
+    #     self.model = None
+    #     self.dictionary = AttrDict({"RANDOM_STATE_MODEL": RANDOM_STATE_MODEL,
+    #                                 "TREES_COUNT": TREES_COUNT,
+    #                                 "N_SPLITS": N_SPLITS,
+    #                                 "N_REPEATS": N_REPEATS,
+    #                                 "RANDOM_STATE_METRIC": RANDOM_STATE_METRIC})
+
     def __init__(self, RANDOM_STATE_MODEL=1, TREES_COUNT=50, N_SPLITS=10, N_REPEATS=3, RANDOM_STATE_METRIC=1):
+        self.scores = None
+        self.model = None
         self.RANDOM_STATE_METRIC = RANDOM_STATE_METRIC
         self.N_REPEATS = N_REPEATS
         self.N_SPLITS = N_SPLITS
@@ -40,34 +53,29 @@ class MyRandomForest:
         dataset = dataset_split_train(input_path_train)
         x_train = dataset[0]
         y_train = dataset[1]
-        model = RandomForestRegressor(n_estimators=self.TREES_COUNT, random_state=self.RANDOM_STATE_MODEL)
+        model = RandomForestRegressor(n_estimators=self.TREES_COUNT,
+                                      random_state=self.RANDOM_STATE_MODEL)
         model.fit(x_train, y_train)
-        return model
+        self.model = model
+        cv = RepeatedKFold(n_splits=self.N_SPLITS, n_repeats=self.N_REPEATS,
+                           random_state=self.RANDOM_STATE_METRIC)
+        scores = cross_val_score(model, x_train, y_train, scoring='neg_mean_absolute_error', cv=cv, n_jobs=-1)
+        self.scores = abs(scores)
 
-    @staticmethod
-    def predict_data(model, input_path_test='input/test.csv'):
+    def get_metric(self):
+        if self.scores is not None:
+            return 'Mean MAE: %.3f (%.3f)' % (self.scores.mean(), self.scores.std())
+        return None
+
+    def predict_data(self, input_path_test='input/test.csv'):
         dataset = dataset_split_test(input_path_test)
         x_test = dataset
-
-        prediction = model.predict(x_test)
-
-        return prediction
+        if self.model is not None:
+            prediction = self.model.predict(x_test)
+            return prediction
+        return None
 
     @staticmethod
     def save_model(model):
         joblib.dump(model, "./model_random_forest.joblib")
 
-
-mrf = MyRandomForest()
-my_model = mrf.fit_model('input/train.csv')
-predict = mrf.predict_data(my_model, 'input/test.csv')
-
-output_file = open('output_random_forest.csv', 'w')
-i = 0
-
-print('Id,Prediction', file=output_file)
-for element in predict:
-    print(i, ',', element, file=output_file)
-    i = i + 1
-
-output_file.close()
